@@ -47,7 +47,6 @@ router.put('/:id', async (req,res) => {
     game.teams = teams;
     await game.save();
     res.redirect('/game');
-    }
   }catch(err){
     console.log('error:' + err);
     res.send('error:' + err);
