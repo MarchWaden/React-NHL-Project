@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
+import CustomTeamsList from './CustomTeamsList';
 import TeamsList from './TeamsList';
+import Register from './Register';
 import './App.css';
 
 class App extends Component {
@@ -9,7 +11,22 @@ class App extends Component {
     super();
 
     this.state = {
-      teams: []
+      teams: [],
+      customTeams: []
+    }
+
+    this.submitTeam = this.submitTeam.bind(this);
+  }
+  getCustomTeams = async() => {
+    try{
+      const CustomTeams = await fetch('http://localhost:3001/team');
+
+      const CustomTeamsJson = await CustomTeams.json();
+
+      return CustomTeamsJson;
+
+    }catch(err){
+      console.log(err);
     }
   }
   getNHL = async () => {
@@ -27,6 +44,18 @@ class App extends Component {
     }
 
   }
+  submitTeam = async (event) => {
+   event.preventDefault();
+   console.log(this.name.value);
+   await fetch('http://localhost:3001/team/new', {
+    method: 'post',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+     name: this.name.value
+   })
+   });
+   this.componentDidMount()
+  };
   componentDidMount(){
 
     // we are using a Promise, .then, wafter this function returns whatever it is returning
@@ -35,13 +64,18 @@ class App extends Component {
 
       console.log(data);
       this.setState({teams: data.teams});
-
     }).catch((err) => {
 
 
 
     });
+    this.getCustomTeams().then((data) => {
 
+      console.log(data);
+      this.setState({customTeams: data});
+    }).catch((err) => {
+
+    });
     // componentDidMount, like render, and constructor are part of the component lifectyle,
     // that means these functions get called automatically
 
@@ -57,7 +91,15 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <TeamsList teams={this.state.teams}/>
+        <div id="Add Team">
+          <form onSubmit={this.submitTeam}>
+            Team Name:<input ref={(ref) => {this.name = ref}} type="text" name="name"/><br />
+            <input type="submit"/><br/>
+          </form>
+        </div>
+        <Register/>
+        Custom Teams:<CustomTeamsList teams={this.state.customTeams}/>
+        Official Teams:<TeamsList teams={this.state.teams}/>
       </div>
     );
   }

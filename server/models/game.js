@@ -6,7 +6,7 @@ const gameSchema = new mongoose.Schema ({
     required: true,
   },
   teams: {
-    type: [String],
+    type: [{type: mongoose.Schema.Types.ObjectId, ref: 'team'}],
     required: true
   }
 })
